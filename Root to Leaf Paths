@@ -1,0 +1,20 @@
+void RLF(Node* root , vector<vector<int>>&ans , vector<int>&temp)
+{
+    if(root == NULL) return ;
+    temp.push_back(root->data);
+        if(root->left == NULL && root->right == NULL){
+        ans.push_back(temp);
+        temp.pop_back();
+        return ;
+    }
+    RLF(root->left , ans , temp);
+    RLF(root->right , ans , temp);
+    temp.pop_back();
+}
+vector<vector<int>> Paths(Node* root)
+{
+    vector<vector<int>> ans;
+    vector<int> temp;
+    RLF(root , ans , temp);
+    return ans;
+}
