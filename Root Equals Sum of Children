@@ -1,0 +1,13 @@
+class Solution {
+public:
+    bool checkTree(TreeNode* root) {
+        if(root == NULL) return true;
+        int child = 0;
+        if(root->left) child+=root->left->val;
+        if(root->right) child+=root->right->val;
+        if(child != root->val) return false;
+        checkTree(root->left);
+        checkTree(root->right);
+        return true;
+    }
+};
