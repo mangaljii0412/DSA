@@ -1,0 +1,27 @@
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        int inStart = 0 ;
+        int inEnd = inorder.size()-1;
+        int postStart = 0;
+        int postEnd = postorder.size()-1;
+        // if(inEnd != postEnd) return NULL;
+        map<int , int > mp;
+        for(int i = inStart ; i <= inEnd ; i++) mp[inorder[i]] = i;
+
+        return buildTre(inorder , inStart , inEnd , postorder , postStart , postEnd , mp);
+    }
+
+    TreeNode* buildTre(vector<int>& inorder, int iS , int iE , vector<int>& postorder , int pS , int pE ,  map<int , int>& mp){
+        if(iS > iE || pS > pE) return NULL;
+
+        TreeNode* root = new TreeNode(postorder[pE]);
+        int index = mp[root->val];
+        int nelem = index - iS;
+
+        root->left = buildTre(inorder , iS , index-1 , postorder , pS , pS + nelem - 1 , mp );
+        root->right = buildTre(inorder , index+1 , iE , postorder , pS + nelem , pE - 1 , mp );
+
+        return root;
+    }
+};
