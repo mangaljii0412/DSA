@@ -1,0 +1,18 @@
+void dfs(int node , vector<int> adj[] , vector<int> &ans , int vis1[]){
+      
+      ans.push_back(node);
+      for(auto it : adj[node]){
+          if(!vis1[it]){
+              vis1[it] = 1;
+              dfs(it , adj , ans , vis1);
+          }
+      }
+  }
+    // Function to return a list containing the DFS traversal of the graph.
+    vector<int> dfsOfGraph(int V, vector<int> adj[]) {
+        int vis[V] = {0};
+        vis[0] = 1;
+        vector<int> ans;
+        dfs(0 , adj , ans , vis);
+        return ans;
+    }
