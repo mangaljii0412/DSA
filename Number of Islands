@@ -1,0 +1,5 @@
+grid[i][j]=0;
+    dfs(i-1,j,trow,tcol,grid);
+    dfs(i+1,j,trow,tcol,grid);
+    dfs(i,j-1,trow,tcol,grid);
+    dfs(i,j+1,trow,tcol,grid);
