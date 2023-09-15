@@ -1,0 +1,24 @@
+class Solution {
+public:
+
+void dfs(int i , int j, int trow , int tcol ,vector<vector<int>>& image ,int initial , int color ){
+    if(i >= 0 && i < trow && j >= 0 && j < tcol && image[i][j]==initial && image[i][j]!=color){
+    image[i][j] = color;
+    dfs(i-1,j,trow,tcol,image,initial,color);
+    dfs(i+1,j,trow,tcol,image,initial,color);
+    dfs(i,j-1,trow,tcol,image,initial,color);
+    dfs(i,j+1,trow,tcol,image,initial,color);
+    }
+    else{
+    return ;
+    }
+
+}
+    vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int color) {
+        int m = image.size();
+        int n = image[0].size();
+        int initial = image[sr][sc];
+        dfs(sr,sc,m,n,image,initial,color);
+        return image;
+    }
+};
