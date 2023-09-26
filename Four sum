@@ -1,3 +1,4 @@
+///TIME COMPLEXITY IS LOW
 class Solution {
 public:
     vector<vector<int>> fourSum(vector<int>& nums, int target) {
@@ -32,5 +33,45 @@ public:
         }
         // vector<vector<int>>ans(res.begin(),res.end());
         return res;
+    }
+};
+
+
+
+
+
+///TIME COMPLEXITY IS HIGH
+class Solution {
+public:
+    vector<vector<int>> fourSum(vector<int>& arr, int num) {
+        sort(arr.begin(),arr.end());
+        vector<vector<int>>ans;
+        
+        set<vector<int>>st;
+        for(int i=0;i<arr.size();i++){
+            for(int j=i+1;j<arr.size();j++){
+                int left = j+1;
+                int right = arr.size()-1;
+                while(left<right){
+                    double sum = (double)arr[i] + arr[j] + arr[left] + arr[right];
+                    if(sum<num){
+                        left++;
+                    }else if(sum>num){
+                        right--;
+                    }else{
+                        vector<int>temp = {arr[i],arr[j],arr[left],arr[right]};
+                        sort(temp.begin(),temp.end());
+                        st.insert(temp);
+                        left++;
+                        right--;
+                    }
+                }
+            }
+        }
+        
+        for(auto it:st){
+            ans.push_back(it);
+        }
+        return ans;
     }
 };
