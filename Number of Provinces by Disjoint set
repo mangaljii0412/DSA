@@ -1,0 +1,69 @@
+class DisjointSet
+{
+    
+public:
+    vector<int> rank,parent,size;
+    DisjointSet(int n){
+        rank.resize(n+1,0);
+        parent.resize(n+1);
+        size.resize(n+1,1);
+        for(int i = 0 ; i <= n ;i++)
+        parent[i] = i;
+    }
+
+    int findparent(int node){
+        if(node == parent[node])
+            return node;
+        return parent[node] =  findparent(parent[node]);
+    }
+
+    void union_by_rank(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(rank[ulp_u] < rank[ulp_v])
+            parent[ulp_u] = ulp_v;
+        else if(rank[ulp_v] < rank[ulp_u])
+            parent[ulp_v] = ulp_u;
+        else{
+            parent[ulp_v] = ulp_u;
+            rank[ulp_u]++;
+        }
+    }
+
+    void union_by_size(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(size[ulp_u] < size[ulp_v]){
+            parent[ulp_u] = ulp_v;
+            size[ulp_v] += size[ulp_u];
+        }
+        else if(size[ulp_v] < size[ulp_u]){
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+        else{
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+    }
+};
+
+class Solution {
+  public:
+    int numProvinces(vector<vector<int>> adj, int V) {
+        DisjointSet ds(V);
+        for(int i = 0 ; i < V ;i++){
+            for(int j = 0 ; j < V ;j++){
+                if(adj[i][j] == 1)
+                    ds.union_by_rank(i,j);
+            }
+        }
+        int count = 0;
+        for(int i = 0 ; i < V ;i++){
+                if(ds.findparent(i) == i) count++;
+        }
+        return count;
+        
+    }
