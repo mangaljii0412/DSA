@@ -1,0 +1,101 @@
+class DisjointSetUnion_By_Rank
+{
+    
+public:
+    vector<int> rank,parent,size;
+    DisjointSetUnion_By_Rank(int n){
+        rank.resize(n+1,0);
+        parent.resize(n+1);
+        size.resize(n+1,1);
+        for(int i = 0 ; i <= n ;i++)
+        parent[i] = i;
+    }
+
+    int findparent(int node){
+        if(node == parent[node])
+            return node;
+        return parent[node] =  findparent(parent[node]);
+    }
+
+    void union_by_rank(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(rank[ulp_u] < rank[ulp_v])
+            parent[ulp_u] = ulp_v;
+        else if(rank[ulp_v] < rank[ulp_u])
+            parent[ulp_v] = ulp_u;
+        else{
+            parent[ulp_v] = ulp_u;
+            rank[ulp_u]++;
+        }
+    }
+
+    void union_by_size(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(size[ulp_u] < size[ulp_v]){
+            parent[ulp_u] = ulp_v;
+            size[ulp_v] += size[ulp_u];
+        }
+        else if(size[ulp_v] < size[ulp_u]){
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+        else{
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+    }
+};
+class Solution {
+public:
+    int largestIsland(vector<vector<int>>& grid) {
+        int n = grid.size();
+        DisjointSetUnion_By_Rank ds(n*n);
+        // step 1 
+        for(int row = 0 ; row < n ; row++){
+            for(int col = 0 ; col < n ; col++){
+                if(grid[row][col] == 0) continue;
+                int dr[] = {-1,0,1,0};
+                int dc[] = {0,1,0,-1};
+                for(int ind = 0 ; ind < 4 ; ind++){
+                    int newr = row + dr[ind];
+                    int newc = col + dc[ind];
+                    if(newr >= 0 && newr < n && newc >= 0 && newc < n && grid[newr][newc] == 1){
+                        int nodeno = row*n+col;
+                        int adjnodeno = newr*n+newc;
+                        ds.union_by_size(nodeno , adjnodeno);
+                    }
+                }
+            }   
+        }
+        int maxi = 0;
+        for(int row = 0 ; row < n ; row++){
+            for(int col = 0 ; col < n ; col++){
+                if(grid[row][col] == 1) continue;
+                set<int> st;
+                int dr[] = {-1,0,1,0};
+                int dc[] = {0,1,0,-1};
+                for(int ind = 0 ; ind < 4 ; ind++){
+                    int newr = row + dr[ind];
+                    int newc = col + dc[ind];
+                    if(newr >= 0 && newr < n && newc >= 0 && newc < n && grid[newr][newc] == 1){
+                        st.insert(ds.findparent(newr * n + newc));
+                    }
+                }
+                int sizetotal = 1 ;
+                for(auto it : st){
+                    sizetotal += ds.size[it];
+                }
+                maxi = max(maxi , sizetotal);
+            }
+        }
+        
+        for(int i = 0 ; i < n*n ; i++){
+            maxi = max(maxi , ds.size[ds.findparent(i)]);
+        }
+        return maxi;
+    }
+};
