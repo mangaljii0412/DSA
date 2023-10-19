@@ -1,0 +1,79 @@
+class DisjointSetUnion_By_Rank
+{
+    vector<int> rank,parent,size;
+public:
+    DisjointSetUnion_By_Rank(int n){
+        rank.resize(n+1,0);
+        parent.resize(n+1);
+        size.resize(n+1,1);
+        for(int i = 0 ; i <= n ;i++)
+        parent[i] = i;
+    }
+
+    int findparent(int node){
+        if(node == parent[node])
+            return node;
+        return parent[node] =  findparent(parent[node]);
+    }
+
+    void union_by_rank(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(rank[ulp_u] < rank[ulp_v])
+            parent[ulp_u] = ulp_v;
+        else if(rank[ulp_v] < rank[ulp_u])
+            parent[ulp_v] = ulp_u;
+        else{
+            parent[ulp_v] = ulp_u;
+            rank[ulp_u]++;
+        }
+    }
+
+    void union_by_size(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(size[ulp_u] < size[ulp_v]){
+            parent[ulp_u] = ulp_v;
+            size[ulp_v] += size[ulp_u];
+        }
+        else if(size[ulp_v] < size[ulp_u]){
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+        else{
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+    }
+};
+class Solution {
+public:
+    int removeStones(vector<vector<int>>& stones) {
+        int n = stones.size();
+        cout<<n<<endl;
+        int maxrow = 0;
+        int maxcol = 0;
+        for(auto it : stones){
+            maxrow = max(maxrow,it[0]);
+            maxcol = max(maxcol,it[1]);
+        }
+        
+        DisjointSetUnion_By_Rank ds(maxrow+maxcol+1);
+        
+        unordered_map<int,int> mp;
+        for(auto it : stones){
+            int noderow = it[0];
+            int nodecol = it[1]+maxrow+1;
+            ds.union_by_size(noderow,nodecol);
+            mp[noderow] = 1;
+            mp[nodecol] = 1;
+        }
+        int count = 0 ;
+        for(auto it : mp){
+            if(ds.findparent(it.first) == it.first) count++;
+        }
+        return  n-count;
+    }
+};
