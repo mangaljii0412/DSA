@@ -1,0 +1,86 @@
+class DisjointSetUnion_By_Rank
+{
+    vector<int> rank,parent,size;
+public:
+    DisjointSetUnion_By_Rank(int n){
+        rank.resize(n+1,0);
+        parent.resize(n+1);
+        size.resize(n+1,1);
+        for(int i = 0 ; i <= n ;i++)
+        parent[i] = i;
+    }
+
+    int findparent(int node){
+        if(node == parent[node])
+            return node;
+        return parent[node] =  findparent(parent[node]);
+    }
+
+    void union_by_rank(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(rank[ulp_u] < rank[ulp_v])
+            parent[ulp_u] = ulp_v;
+        else if(rank[ulp_v] < rank[ulp_u])
+            parent[ulp_v] = ulp_u;
+        else{
+            parent[ulp_v] = ulp_u;
+            rank[ulp_u]++;
+        }
+    }
+
+    void union_by_size(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(size[ulp_u] < size[ulp_v]){
+            parent[ulp_u] = ulp_v;
+            size[ulp_v] += size[ulp_u];
+        }
+        else if(size[ulp_v] < size[ulp_u]){
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+        else{
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+    }
+};
+class Solution {
+  public:
+    vector<int> numOfIslands(int n, int m, vector<vector<int>> &operators) {
+        vector<vector<int>> vis(n,vector<int> (m,0));
+        DisjointSetUnion_By_Rank ds(n*m);
+        int count = 0;
+        vector<int> ans;
+        for(auto it : operators){
+            int row = it[0];
+            int col = it[1];
+            if(vis[row][col] == 1){
+                ans.push_back(count);
+                continue;
+            }
+            vis[row][col] = 1 ;
+            count++;
+            
+            int dr[] = {-1,0,1,0};
+            int dc[] = {0,1,0,-1};
+            for(int i = 0  ; i < 4;i++){
+                int adjr = row + dr[i];
+                int adjc = col + dc[i];
+                if(adjr >= 0 && adjr < n && adjc >=0 && adjc < m){
+                    if(vis[adjr][adjc] == 1){
+                        int nodeno = row*m+col;
+                        int adjnodeno = adjr*m+adjc;
+                        if(ds.findparent(nodeno) != ds.findparent(adjnodeno)) count--;
+                        ds.union_by_size(nodeno , adjnodeno);
+                    }
+                }
+            }
+            ans.push_back(count);
+        }
+        return  ans;
+    }
+};
