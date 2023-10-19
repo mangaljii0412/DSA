@@ -1,0 +1,85 @@
+class DisjointSetUnion_By_Rank
+{
+    vector<int> rank,parent,size;
+public:
+    DisjointSetUnion_By_Rank(int n){
+        rank.resize(n+1,0);
+        parent.resize(n+1);
+        size.resize(n+1,1);
+        for(int i = 0 ; i <= n ;i++)
+        parent[i] = i;
+    }
+
+    int findparent(int node){
+        if(node == parent[node])
+            return node;
+        return parent[node] =  findparent(parent[node]);
+    }
+
+    void union_by_rank(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(rank[ulp_u] < rank[ulp_v])
+            parent[ulp_u] = ulp_v;
+        else if(rank[ulp_v] < rank[ulp_u])
+            parent[ulp_v] = ulp_u;
+        else{
+            parent[ulp_v] = ulp_u;
+            rank[ulp_u]++;
+        }
+    }
+
+    void union_by_size(int u , int v){
+        int ulp_u = findparent(u);
+        int ulp_v = findparent(v);
+        if(ulp_u == ulp_v) return ;
+        if(size[ulp_u] < size[ulp_v]){
+            parent[ulp_u] = ulp_v;
+            size[ulp_v] += size[ulp_u];
+        }
+        else if(size[ulp_v] < size[ulp_u]){
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+        else{
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+    }
+};
+class Solution {
+public:
+    vector<vector<string>> accountsMerge(vector<vector<string>>& accounts) {
+        int n = accounts.size();
+        DisjointSetUnion_By_Rank ds(n);
+        unordered_map<string , int> mapmail;
+        for(int i = 0 ; i < n ; i++){
+            for(int j = 1 ; j < accounts[i].size() ; j++){
+                string mail = accounts[i][j];
+                if(mapmail.find(mail) == mapmail.end()) mapmail[mail] = i;
+                else ds.union_by_size(i,mapmail[mail]);
+            }
+        }
+        
+        vector<string> mergemail[n];
+        for(auto it : mapmail){
+            string mail = it.first;
+            int node = ds.findparent(it.second);
+            mergemail[node].push_back(mail);
+        }
+        
+        vector<vector<string>> ans;
+        for(int i = 0 ; i < n ; i++){
+            if(mergemail[i].size() == 0) continue;
+            sort(mergemail[i].begin() , mergemail[i].end());
+            vector<string> temp;
+            temp.push_back(accounts[i][0]);
+            for(auto it : mergemail[i]){
+                temp.push_back(it);
+            }
+            ans.push_back(temp);
+        }
+        return ans;
+    }
+};
